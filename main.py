@@ -2,6 +2,13 @@ import requests
 import bs4
 import re
 
+
+def converting_a_string_into_a_set(string):
+    string_list = re.findall("\w+", string)
+    set_string = set(string_l.lower() for string_l in string_list)
+    return set_string
+
+
 response = requests.get('https://habr.com/ru/all/')
 response.raise_for_status()
 
@@ -13,15 +20,13 @@ articles = soup.find_all('article')
 for article in articles:
     text = article.find(class_="article-formatted-body article-formatted-body_version-2")
     if text is not None:
-        text_list = re.findall("\w+", text.text)
-        text_set = set(text.lower() for text in text_list)
+        text_set = converting_a_string_into_a_set(text.text)
 
     hubs = article.find_all(class_="tm-article-snippet__hubs-item")
     hubs_set = set(hub.find('span').text for hub in hubs)
 
     title = article.find('h2').text
-    title_list = re.findall("\w+", title)
-    title_set = set(title.lower() for title in title_list)
+    title_set = converting_a_string_into_a_set(title)
 
     link = article.find(class_="tm-article-snippet__readmore").attrs['href']
     link_to_the_page = 'https://habr.com' + link
